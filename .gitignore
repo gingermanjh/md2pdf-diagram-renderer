@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+.env
+build/
+dist/
+node_modules/
+
+# Temporary render artifacts
+md2pdf-*/

@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "md2pdf-diagram-renderer"
+version = "0.1.0"
+description = "Render Markdown with Mermaid, PlantUML, and ASCII diagrams to PDF"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "gingermanjh" }
+]
+dependencies = [
+  "jinja2>=3.1.0",
+  "markdown-it-py>=3.0.0",
+  "playwright>=1.40.0",
+  "typer>=0.15.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+]
+
+[project.scripts]
+md2pdf = "md2pdf_cli.cli:app"
+md2pdf-bootstrap = "md2pdf_cli._bootstrap:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/md2pdf_cli"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"src/md2pdf_cli/assets" = "md2pdf_cli/assets"
+"src/md2pdf_cli/templates" = "md2pdf_cli/templates"
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+markers = [
+  "integration: marks tests that require external tools",
+]
