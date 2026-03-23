@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import platform
 from pathlib import Path
 
@@ -16,7 +17,7 @@ def data_dir() -> Path:
         base = Path.home() / "AppData" / "Local"
     else:
         base = Path(
-            __import__("os").environ.get("XDG_DATA_HOME", str(Path.home() / ".local" / "share"))
+            os.environ.get("XDG_DATA_HOME", str(Path.home() / ".local" / "share"))
         )
     return base / "md2pdf"
 

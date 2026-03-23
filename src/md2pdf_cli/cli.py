@@ -57,9 +57,6 @@ def main(
         if not input_path.exists() or not input_path.is_file():
             raise InputParseError(f"Input Markdown file not found: {input_path}")
 
-        if page_size not in ("Letter", "A4"):
-            raise InputParseError(f"Unsupported page size: {page_size}")
-
         config = RenderConfig(
             page_size=page_size,
             margin_top=margin_top,
@@ -94,4 +91,4 @@ def main(
         raise
     except Exception as exc:  # pragma: no cover - unexpected failures
         logger.exception("Unexpected error: %s", exc)
-        raise typer.Exit(code=int(ExitCode.PDF_RENDER_ERROR)) from exc
+        raise typer.Exit(code=int(ExitCode.UNEXPECTED_ERROR)) from exc

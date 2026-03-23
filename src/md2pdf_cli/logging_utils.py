@@ -10,13 +10,17 @@ def configure_logging(verbose: bool) -> logging.Logger:
     level = logging.DEBUG if verbose else logging.INFO
     logger.setLevel(level)
 
-    if not logger.handlers:
-        handler = logging.StreamHandler()
-        formatter = logging.Formatter("[%(levelname)s] %(message)s")
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+    # Remove existing handlers to prevent duplicates on repeated calls
+    for h in logger.handlers[:]:
+        logger.removeHandler(h)
 
-    for handler in logger.handlers:
-        handler.setLevel(level)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter("[%(levelname)s] %(message)s")
+    handler.setFormatter(formatter)
+    handler.setLevel(level)
+    logger.addHandler(handler)
+
+    # Prevent log propagation to root logger
+    logger.propagate = False
 
     return logger

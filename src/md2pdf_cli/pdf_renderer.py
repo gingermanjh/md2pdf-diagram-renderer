@@ -35,3 +35,7 @@ def render_pdf_from_html(*, html: str, output_path: Path, config: RenderConfig) 
                 browser.close()
     except PlaywrightError as exc:
         raise PdfRenderError(f"Failed to render PDF via Playwright: {exc}") from exc
+    except OSError as exc:
+        raise PdfRenderError(f"Failed to write PDF to {output_path}: {exc}") from exc
+    except Exception as exc:
+        raise PdfRenderError(f"Unexpected error during PDF rendering: {exc}") from exc

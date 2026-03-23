@@ -15,7 +15,6 @@ def check_common_dependencies() -> None:
     messages: list[str] = []
 
     try:
-        from playwright.sync_api import Error as PlaywrightError
         from playwright.sync_api import sync_playwright
     except ImportError:
         messages.append(
@@ -26,7 +25,7 @@ def check_common_dependencies() -> None:
             with sync_playwright() as playwright:
                 browser = playwright.chromium.launch(headless=True)
                 browser.close()
-        except (PlaywrightError, Exception):
+        except Exception:
             messages.append(
                 "Playwright Chromium is not available. "
                 "Run `python -m playwright install chromium`."
@@ -70,46 +69,10 @@ def check_plantuml_dependencies(jar: Path | None = None) -> Path:
 
 def check_runtime_dependencies(project_root: Path) -> Path:
     """Backward-compatible wrapper that checks all dependencies at once."""
-    messages: list[str] = []
-
-    if shutil.which("node") is None:
-        messages.append("`node` is missing. Install Node.js 18+.")
-
-    if shutil.which("npx") is None:
-        messages.append("`npx` is missing. Install npm (npx is bundled with npm).")
-
-    if shutil.which("java") is None:
-        messages.append("`java` is missing. Install Java 17+.")
-
+    check_common_dependencies()
+    check_mermaid_dependencies()
     jar = project_root / ".tools" / "plantuml.jar"
-    if not jar.exists():
-        messages.append(
-            f"PlantUML jar not found at {jar}. "
-            "Run `md2pdf-bootstrap` to download it."
-        )
-
-    try:
-        from playwright.sync_api import Error as PlaywrightError
-        from playwright.sync_api import sync_playwright
-    except ImportError:
-        messages.append(
-            "Python dependency `playwright` is missing. Run `pip install playwright`."
-        )
-    else:
-        try:
-            with sync_playwright() as playwright:
-                browser = playwright.chromium.launch(headless=True)
-                browser.close()
-        except (PlaywrightError, Exception):
-            messages.append(
-                "Playwright Chromium is not available. "
-                "Run `python -m playwright install chromium`."
-            )
-
-    if messages:
-        raise DependencyError(messages)
-
-    return jar
+    return check_plantuml_dependencies(jar=jar)
 
 
 def render_diagram_fragments(
@@ -186,6 +149,7 @@ def _render_mermaid_svg(*, block: DiagramBlock, temp_dir: Path, timeout: int) ->
             command,
             capture_output=True,
             text=True,
+            encoding="utf-8",
             check=False,
             timeout=timeout,
             cwd=str(temp_dir),
@@ -218,7 +182,7 @@ def _render_mermaid_svg(*, block: DiagramBlock, temp_dir: Path, timeout: int) ->
         )
 
     svg = output_path.read_text(encoding="utf-8")
-    if "<svg" not in svg:
+    if "<svg" not in svg or "</svg>" not in svg:
         raise DiagramRenderError(
             kind="mermaid",
             index=block.index,
@@ -247,6 +211,7 @@ def _render_plantuml_svg(*, block: DiagramBlock, plantuml_jar: Path, timeout: in
             input=block.code,
             capture_output=True,
             text=True,
+            encoding="utf-8",
             check=False,
             timeout=timeout,
         )
@@ -269,7 +234,7 @@ def _render_plantuml_svg(*, block: DiagramBlock, plantuml_jar: Path, timeout: in
         )
 
     svg = result.stdout
-    if "<svg" not in svg:
+    if "<svg" not in svg or "</svg>" not in svg:
         raise DiagramRenderError(
             kind="plantuml",
             index=block.index,

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import lru_cache
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
@@ -8,7 +9,7 @@ from ._paths import css_path as _package_css_path
 from ._paths import template_dir as _package_template_dir
 
 _DEFAULT_TEMPLATE = """<!doctype html>
-<html lang="ko">
+<html lang="{{ lang }}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -71,13 +72,14 @@ th, td {
 
 
 def build_html_document(
-    *, body_html: str, title: str, project_root: Path | None = None
+    *, body_html: str, title: str, lang: str = "ko", project_root: Path | None = None
 ) -> str:
     css_text = _load_css(project_root)
     template = _load_template(project_root)
-    return template.render(title=title, css=css_text, body_html=body_html)
+    return template.render(title=title, css=css_text, body_html=body_html, lang=lang)
 
 
+@lru_cache(maxsize=8)
 def _load_template(project_root: Path | None):
     # 1. Explicit override
     if project_root is not None:
@@ -97,6 +99,7 @@ def _load_template(project_root: Path | None):
     return env.from_string(_DEFAULT_TEMPLATE)
 
 
+@lru_cache(maxsize=8)
 def _load_css(project_root: Path | None) -> str:
     # 1. Explicit override
     if project_root is not None:
