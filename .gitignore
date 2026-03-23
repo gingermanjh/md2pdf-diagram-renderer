@@ -8,5 +8,19 @@ build/
 dist/
 node_modules/
 
+# OS
+.DS_Store
+
+# IDE
+.idea/
+
+# AI agent configs
+CLAUDE.md
+AGENT.md
+.claude/
+
+# Downloaded tools
+.tools/
+
 # Temporary render artifacts
 md2pdf-*/
