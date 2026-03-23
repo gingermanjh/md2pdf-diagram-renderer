@@ -87,6 +87,21 @@ def test_dependency_check_reports_missing_commands(
     assert "`java` is missing" in str(exc_info.value)
 
 
+def test_runtime_dependencies_succeeds(
+    monkeypatch: pytest.MonkeyPatch, tmp_path
+) -> None:
+    _install_fake_playwright(monkeypatch)
+    monkeypatch.setattr("md2pdf_cli.diagram_renderers.shutil.which", lambda _name: "/bin/mock")
+
+    tools_dir = tmp_path / ".tools"
+    tools_dir.mkdir(parents=True, exist_ok=True)
+    jar = tools_dir / "plantuml.jar"
+    jar.write_bytes(b"jar")
+
+    result = check_runtime_dependencies(tmp_path)
+    assert result == jar
+
+
 # --- Split function tests ---
 
 

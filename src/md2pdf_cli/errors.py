@@ -5,6 +5,7 @@ from enum import IntEnum
 
 class ExitCode(IntEnum):
     SUCCESS = 0
+    UNEXPECTED_ERROR = 1
     DEPENDENCY_ERROR = 2
     DIAGRAM_RENDER_ERROR = 3
     INPUT_PARSE_ERROR = 4
