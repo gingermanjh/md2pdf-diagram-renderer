@@ -30,10 +30,6 @@ md2pdf-bootstrap = "md2pdf_cli._bootstrap:main"
 [tool.hatch.build.targets.wheel]
 packages = ["src/md2pdf_cli"]
 
-[tool.hatch.build.targets.wheel.force-include]
-"src/md2pdf_cli/assets" = "md2pdf_cli/assets"
-"src/md2pdf_cli/templates" = "md2pdf_cli/templates"
-
 [tool.pytest.ini_options]
 addopts = "-q"
 testpaths = ["tests"]
